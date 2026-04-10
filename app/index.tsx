@@ -59,7 +59,7 @@ const index = () => {
 
         {/* Indore Card */}
         <TouchableOpacity
-          style={[styles.card, styles.kolkataCard]}
+          style={[styles.card, styles.indoreCard]}
           activeOpacity={0.85}
           onPress={() => router.push('/indore')}
         >
@@ -174,6 +174,10 @@ const styles = StyleSheet.create({
   kolkataCard: {
     borderLeftWidth: 4,
     borderLeftColor: '#7b2cbf',
+  },
+  indoreCard: {
+    borderLeftWidth: 4,
+    borderLeftColor: '#659a29ff',
   },
   cardEmoji: {
     fontSize: 40,

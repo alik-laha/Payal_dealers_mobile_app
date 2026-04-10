@@ -56,6 +56,22 @@ const index = () => {
             <Text style={styles.arrowText}>→</Text>
           </View>
         </TouchableOpacity>
+
+        {/* Indore Card */}
+        <TouchableOpacity
+          style={[styles.card, styles.kolkataCard]}
+          activeOpacity={0.85}
+          onPress={() => router.push('/indore')}
+        >
+          <Text style={styles.cardEmoji}>🤖</Text>
+          <View style={styles.cardTextContainer}>
+            <Text style={styles.cardTitle}>Indore</Text>
+            <Text style={styles.cardSubtitle}>ORIGIN</Text>
+          </View>
+          <View style={[styles.cardArrow, styles.indoreArrow]}>
+            <Text style={styles.arrowText}>→</Text>
+          </View>
+        </TouchableOpacity>
       </View>
 
       {/* Footer */}
@@ -189,6 +205,9 @@ const styles = StyleSheet.create({
   },
   kolkataArrow: {
     backgroundColor: 'rgba(123, 44, 191, 0.1)',
+  },
+  indoreArrow:{
+    backgroundColor: 'rgba(123, 148, 30, 0.1)',
   },
   arrowText: {
     fontSize: 22,

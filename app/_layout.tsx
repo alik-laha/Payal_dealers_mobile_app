@@ -5,6 +5,7 @@ export default function Layout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name='kolkata' />
       <Stack.Screen name='africa' />
+      <Stack.Screen name='indore' />
     </Stack>
   );
 }

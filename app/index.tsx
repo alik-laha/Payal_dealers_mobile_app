@@ -4,6 +4,24 @@ import { Dimensions, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 
 
 const { width, height } = Dimensions.get('window')
 
+const apiConfig = [
+  {
+    name: "PDPL-kolkata",
+    redirectUrl: "https://kolkata.pdpl.aispkoldev.space",
+    loginApiUrl: "https://kolkata.pdpl.aispkoldev.space//api/login"
+  },
+  {
+    name: "PDPL-africa",
+    redirectUrl: "https://africa.pdpl.aispkoldev.space",
+    loginApiUrl: "https://africa.pdpl.aispkoldev.space/api/login"
+  },
+  {
+    name: "PDPL-indore",
+    redirectUrl: "https://pdpl.indore.aispkoldev.space",
+    loginApiUrl: "https://pdpl.indore.aispkoldev.space/api/login"
+  }
+];
+
 const index = () => {
   const router = useRouter()
 

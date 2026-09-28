@@ -1,29 +1,75 @@
-import { useRouter } from 'expo-router'
 import React from 'react'
-import { Dimensions, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Dimensions, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View, ActivityIndicator, Alert } from 'react-native'
+import { Picker } from '@react-native-picker/picker'
+import { apiConfig } from '../constants/apiConfig'
+import { useRouter } from 'expo-router'
 
 const { width, height } = Dimensions.get('window')
 
-const apiConfig = [
-  {
-    name: "PDPL-kolkata",
-    redirectUrl: "https://kolkata.pdpl.aispkoldev.space",
-    loginApiUrl: "https://kolkata.pdpl.aispkoldev.space//api/login"
-  },
-  {
-    name: "PDPL-africa",
-    redirectUrl: "https://africa.pdpl.aispkoldev.space",
-    loginApiUrl: "https://africa.pdpl.aispkoldev.space/api/login"
-  },
-  {
-    name: "PDPL-indore",
-    redirectUrl: "https://pdpl.indore.aispkoldev.space",
-    loginApiUrl: "https://pdpl.indore.aispkoldev.space/api/login"
-  }
-];
-
 const index = () => {
   const router = useRouter()
+  const [selectedPlatform, setSelectedPlatform] = React.useState(apiConfig[0])
+  const [username, setUsername] = React.useState('')
+  const [password, setPassword] = React.useState('')
+  const [loading, setLoading] = React.useState(false)
+
+  const handleLogin = async () => {
+    if (!username || !password) {
+      Alert.alert('Error', 'Please enter both username and password')
+      return
+    }
+
+    setLoading(true)
+    try {
+      const response = await fetch(selectedPlatform.loginApiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userName: username,
+          password,
+        }),
+      })
+
+      // console.log('Login Response Status:', response.status)
+      console.log('Login Response Headers:', Object.fromEntries(response.headers))
+      // console.log('Login Response Cookies:', response.headers.get('Set-Cookie'))
+      
+      const cookiesHeader = response.headers.get('Set-Cookie')
+      console.log('Login Response Cookies:', cookiesHeader)
+      
+      const responseText = await response.text()
+      console.log('Login Response Text:', responseText)
+      
+      const data = JSON.parse(responseText)
+      console.log('Login Response Body:', data)
+      
+      if (response.status === 200 || response.status === 201) {
+        const cookies = cookiesHeader?.split(',') || []
+        const cookiesString = cookies.map((c: string) => c.trim()).join('; ')
+        console.log('Cookies string for WebView:', cookiesString)
+        
+        Alert.alert('Login Successful', 'Redirecting to dashboard...')
+        router.push({
+          pathname: '/kolkata',
+          params: {
+            cookies: cookiesString,
+            username,
+            platform: selectedPlatform.name,
+            redirectUrl: selectedPlatform.redirectUrl,
+          },
+        })
+      } else {
+        Alert.alert('Login Error', data.message || 'Login failed')
+      }
+    } catch (error) {
+      console.log('Login Error:', error)
+      Alert.alert('Error', 'Login failed. Please check your connection.')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -38,57 +84,52 @@ const index = () => {
       <View style={styles.header}>
         <Text style={styles.logo}>🌍</Text>
         <Text style={styles.title}>PDPL Connect</Text>
-        <Text style={styles.subtitle}>Select your origin to continue</Text>
+        <Text style={styles.subtitle}>Login to your account</Text>
       </View>
 
-      {/* Cards */}
-      <View style={styles.cardContainer}>
-        {/* Africa Card */}
-        <TouchableOpacity
-          style={[styles.card, styles.africaCard]}
-          activeOpacity={0.85}
-          onPress={() => router.push('/africa')}
-        >
-          <Text style={styles.cardEmoji}>🌍</Text>
-          <View style={styles.cardTextContainer}>
-            <Text style={styles.cardTitle}>Africa</Text>
-            <Text style={styles.cardSubtitle}>ORIGIN</Text>
-          </View>
-          <View style={[styles.cardArrow, styles.africaArrow]}>
-            <Text style={styles.arrowText}>→</Text>
-          </View>
-        </TouchableOpacity>
+      {/* Platform Selection */}
+      <View style={styles.formContainer}>
+        <Text style={styles.label}>Select Platform</Text>
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={selectedPlatform.name}
+            onValueChange={(itemValue) => {
+              const platform = apiConfig.find((p) => p.name === itemValue)
+              if (platform) setSelectedPlatform(platform)
+            }}
+            style={styles.picker}
+          >
+            {apiConfig.map((platform) => (
+              <Picker.Item key={platform.name} label={platform.name} value={platform.name} />
+            ))}
+          </Picker>
+        </View>
 
-        {/* Kolkata Card */}
-        <TouchableOpacity
-          style={[styles.card, styles.kolkataCard]}
-          activeOpacity={0.85}
-          onPress={() => router.push('/kolkata')}
-        >
-          <Text style={styles.cardEmoji}>🏛️</Text>
-          <View style={styles.cardTextContainer}>
-            <Text style={styles.cardTitle}>Kolkata</Text>
-            <Text style={styles.cardSubtitle}>ORIGIN</Text>
-          </View>
-          <View style={[styles.cardArrow, styles.kolkataArrow]}>
-            <Text style={styles.arrowText}>→</Text>
-          </View>
-        </TouchableOpacity>
+        <Text style={styles.label}>Username</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter username"
+          placeholderTextColor="#8892a4"
+          value={username}
+          onChangeText={setUsername}
+        />
 
-        {/* Indore Card */}
-        <TouchableOpacity
-          style={[styles.card, styles.indoreCard]}
-          activeOpacity={0.85}
-          onPress={() => router.push('/indore')}
-        >
-          <Text style={styles.cardEmoji}>🤖</Text>
-          <View style={styles.cardTextContainer}>
-            <Text style={styles.cardTitle}>Indore</Text>
-            <Text style={styles.cardSubtitle}>ORIGIN</Text>
-          </View>
-          <View style={[styles.cardArrow, styles.indoreArrow]}>
-            <Text style={styles.arrowText}>→</Text>
-          </View>
+        <Text style={styles.label}>Password</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter password"
+          placeholderTextColor="#8892a4"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
+
+        <TouchableOpacity style={styles.loginButton} onPress={handleLogin} disabled={loading}>
+          {loading ? (
+            <ActivityIndicator color="#ffffff" />
+          ) : (
+            <Text style={styles.loginButtonText}>Login</Text>
+          )}
         </TouchableOpacity>
       </View>
 
@@ -115,7 +156,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 24,
   },
-  // Decorative circles
   circle: {
     position: 'absolute',
     borderRadius: 999,
@@ -144,10 +184,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#3a86ff',
     opacity: 0.06,
   },
-  // Header
   header: {
     alignItems: 'center',
-    marginBottom: 50,
+    marginBottom: 30,
   },
   logo: {
     fontSize: 60,
@@ -165,78 +204,59 @@ const styles = StyleSheet.create({
     color: '#8892a4',
     letterSpacing: 1,
   },
-  // Cards
-  cardContainer: {
+  formContainer: {
     width: '100%',
-    gap: 20,
-  },
-  card: {
+    backgroundColor: '#ffffff',
     borderRadius: 20,
-    paddingVertical: 28,
-    paddingHorizontal: 24,
-    flexDirection: 'row',
-    alignItems: 'center',
+    padding: 24,
     elevation: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 12,
-    backgroundColor: '#ffffff',
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.04)',
   },
-  africaCard: {
-    borderLeftWidth: 4,
-    borderLeftColor: '#e85d04',
-  },
-  kolkataCard: {
-    borderLeftWidth: 4,
-    borderLeftColor: '#7b2cbf',
-  },
-  indoreCard: {
-    borderLeftWidth: 4,
-    borderLeftColor: '#659a29ff',
-  },
-  cardEmoji: {
-    fontSize: 40,
-    marginRight: 16,
-  },
-  cardTextContainer: {
-    flex: 1,
-  },
-  cardTitle: {
-    fontSize: 26,
-    fontWeight: '700',
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
     color: '#1a1a2e',
+    marginBottom: 8,
   },
-  cardSubtitle: {
-    fontSize: 12,
-    color: '#8892a4',
-    letterSpacing: 3,
-    marginTop: 4,
+  pickerContainer: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.1)',
+    marginBottom: 16,
   },
-  cardArrow: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+  picker: {
+    height: 50,
+    width: '100%',
+  },
+  input: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    marginBottom: 16,
+    fontSize: 16,
+    color: '#1a1a2e',
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.1)',
+  },
+  loginButton: {
+    backgroundColor: '#1a1a2e',
+    borderRadius: 12,
+    paddingVertical: 16,
     alignItems: 'center',
-    justifyContent: 'center',
+    marginTop: 8,
   },
-  africaArrow: {
-    backgroundColor: 'rgba(232, 93, 4, 0.1)',
-  },
-  kolkataArrow: {
-    backgroundColor: 'rgba(123, 44, 191, 0.1)',
-  },
-  indoreArrow:{
-    backgroundColor: 'rgba(123, 148, 30, 0.1)',
-  },
-  arrowText: {
-    fontSize: 22,
-    color: '#1a1a2e',
+  loginButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
     fontWeight: '700',
   },
-  // Footer
   footer: {
     marginTop: 50,
     alignItems: 'center',

@@ -1,49 +1,72 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useLocalSearchParams } from 'expo-router';
 import { WebView } from 'react-native-webview';
 
 const indore = () => {
-    const [username, setUsername] = useState("");
-    let injectedJs = `
-        (function(){
-            const usernameComp = document.getElementById('username');
-            
-            if(username){
-                document.getElementById('username').value = ${username};
-            }
-            usernameComp.addEventListener('input',(e)=>{
-                window.ReactNativeWebView.postMessage(e.terget.value);
-            });
-            true;
-        })()`
-
-    const handleMessage = async (event: any) => {
-        setUsername(event.nativeEvent.data)
-        await AsyncStorage.setItem('username-indore', event.nativeEvent.data);
-    };
-
-    const getUsername = async () => {
-        const value = await AsyncStorage.getItem('username-indore');
-        setUsername(value || "");
-    }
+    const params = useLocalSearchParams();
+    const cookies = params.cookies as string || '';
+    const username = params.username as string || '';
+    const redirectUrl = params.redirectUrl as string || 'https://pdpl.indore.aispkoldev.space';
 
     useEffect(() => {
-        getUsername();
-    })
+        console.log('Cookies received:', cookies);
+        console.log('Username received:', username);
+        console.log('Redirect URL:', redirectUrl);
+    }, []);
 
     return (
         <View style={styles.container}>
             <StatusBar style="dark" />
             <SafeAreaView style={styles.safe} edges={['top']}>
                 <WebView
-                    source={{ uri: 'https://pdpl.indore.aispkoldev.space' }}
+                    source={{ uri: redirectUrl }}
                     style={styles.webview}
                     bounces={false}
-                    injectedJavaScript={injectedJs}
-                    onMessage={handleMessage}
+                    setCookies={[
+                        {
+                            name: 'token',
+                            value: cookies.includes('token=') ? cookies.split('token=')[1].split(';')[0] : '',
+                            domain: '.pdpl.aispkoldev.space',
+                            path: '/',
+                            secure: true,
+                            httpOnly: true,
+                        },
+                        {
+                            name: 'user',
+                            value: cookies.includes('user=') ? cookies.split('user=')[1].split(';')[0] : '',
+                            domain: '.pdpl.aispkoldev.space',
+                            path: '/',
+                            secure: true,
+                            httpOnly: true,
+                        },
+                        {
+                            name: 'role',
+                            value: cookies.includes('role=') ? cookies.split('role=')[1].split(';')[0] : '',
+                            domain: '.pdpl.aispkoldev.space',
+                            path: '/',
+                            secure: true,
+                            httpOnly: true,
+                        },
+                        {
+                            name: 'dept',
+                            value: cookies.includes('dept=') ? cookies.split('dept=')[1].split(';')[0] : '',
+                            domain: '.pdpl.aispkoldev.space',
+                            path: '/',
+                            secure: true,
+                            httpOnly: true,
+                        },
+                        {
+                            name: 'id',
+                            value: cookies.includes('id=') ? cookies.split('id=')[1].split(';')[0] : '',
+                            domain: '.pdpl.aispkoldev.space',
+                            path: '/',
+                            secure: true,
+                            httpOnly: true,
+                        },
+                    ]}
                     startInLoadingState
                 />
             </SafeAreaView>

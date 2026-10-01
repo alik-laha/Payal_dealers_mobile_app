@@ -120,3 +120,53 @@ export type KolkataDataType = {
   previousUnpeel: number
   previousPeelDate: string
 }
+
+export type OriginQuantity = {
+  origin: string
+  totalQuantity: string
+}
+
+export type AfricaData = {
+  wareHouses: {
+    country: string
+    totalStock: string
+  }[]
+
+  pLotQuantity: OriginQuantity[]
+  moisture8To10: OriginQuantity[]
+  moisture10To12: OriginQuantity[]
+  moisture12To14: OriginQuantity[]
+  moistureAbove14: OriginQuantity[]
+
+  users: { totalUsers: string }[]
+  employess: { totalEmp: string }[]
+
+  vendorCount: number
+  wareHouseCount: number
+
+  pyMapData: {
+    totalQuantity: string
+    totalSumMoisture: string
+    totalSumRate: string
+    totalSumKOR: string
+    origin: string
+  }[]
+
+  bookedQuantity: OriginQuantity[]
+  lossQuantity: { origin: string; lossQuantity: string }[]
+  lossPercentage: { origin: string; lossPercentage: number }[]
+  pendingMapping: { origin: string; quantity: string }[]
+  pendingDry: { origin: string; quantity: string }[]
+  lossQuantity2: { origin: string; lossQuantity: number }[]
+  qtyAtIdealMoisture: OriginQuantity[]
+
+  IDEAL_MOISTURE_WT: number
+}
+
+export type LotKey = 'boil' | 'scoop' | 'borma' | 'humid' | 'peel' | 'Mayur' | 'hamsa' | 'wholes' | 'lw' | 'dpds' | 'sorting' | 'bigT' | 'vil' | 'rej'
+
+export type LotSection = {
+  lotKey: keyof KolkataDataType
+  vLotKey?: keyof KolkataDataType
+  backlogKey: keyof KolkataDataType
+}

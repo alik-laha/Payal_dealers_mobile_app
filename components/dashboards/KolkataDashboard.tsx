@@ -1,16 +1,25 @@
 import React from 'react'
 import { StatusBar, StyleSheet, Text, View } from 'react-native'
 import { KolkataDataType } from '../../types/apiResponse.type'
-import StatCard from './kolkata-indore/StatCard'
-import ReportRow from './kolkata-indore/ReportRow'
+import CompareTable, { CompareRow } from './kolkata-indore/CompareTable'
 import LotCard from './kolkata-indore/LotCard'
-import { safe, TEXT_PRIMARY, TEXT_MUTED } from './kolkata-indore/theme'
-import { LOT_DATA } from '@/export.data';
+import ReportRow from './kolkata-indore/ReportRow'
+import Section from './kolkata-indore/Section'
+import StatCard from './kolkata-indore/StatCard'
+import { safe, TEXT_MUTED, TEXT_PRIMARY, TintKey } from './kolkata-indore/theme'
 
 interface Props {
   data: KolkataDataType
 }
 
+type LotItem = {
+  label: string
+  icon: string
+  tint: TintKey
+  lot: { LotNo: string | null }
+  vLot?: { LotNo: string | null }
+  backlog: { current_backlog?: string; current_backlog1?: string | null; current_backlog2?: string | null }[]
+}
 
 export default function KolkataDashboard({ data }: Props) {
   const totalReceiving = parseFloat(safe(data.fyReceivingTotal?.Total_Receiving, '0')) / 1000
@@ -21,6 +30,131 @@ export default function KolkataDashboard({ data }: Props) {
   const villageOutGate = safe(data.village_out_gate, 0) / 1000
   const villageOutProd = safe(data.village_out_prod, 0) / 1000
   const pendingVillage = safe(data.village_pending, 0) / 1000
+
+  const gatepassRows: CompareRow[] = [
+    {
+      label: 'Pending',
+      prev: safe(data.previousGate, 0),
+      week: safe(data.weekResultGate, 0),
+      month: safe(data.monthResultGate, 0),
+    },
+  ]
+
+  const boilingRows: CompareRow[] = [
+    {
+      label: 'Bag',
+      prev: safe(data.previousBoiling, 0) / 1000,
+      week: safe(data.currentWeekBoil, 0) / 1000,
+      month: safe(data.currentMonthBoiling, 0) / 1000,
+    },
+  ]
+
+  const scoopingRows: CompareRow[] = [
+    {
+      label: 'Broken',
+      prev: safe(data.previousbrokenprcntg, 0),
+      week: safe(data.weeklyBrokenAvg, 0),
+      month: safe(data.monthlyBrokenAvg, 0),
+    },
+    {
+      label: 'Uncut',
+      prev: safe(data.previousuncutprcntg, 0),
+      week: safe(data.weeklyUncutAvg, 0),
+      month: safe(data.monthlyUncutAvg, 0),
+    },
+    {
+      label: 'NonCut',
+      prev: safe(data.previousnoncutprcntg, 0),
+      week: safe(data.weeklyNoncutAvg, 0),
+      month: safe(data.monthlyNoncutAvg, 0),
+    },
+    {
+      label: 'Unscoop',
+      prev: safe(data.previousunscoopprcntg, 0),
+      week: safe(data.weeklyUnscoopAvg, 0),
+      month: safe(data.monthlyUnscoopAvg, 0),
+    },
+    {
+      label: 'Dust',
+      prev: safe(data.previousdustprcntg, 0),
+      week: safe(data.weeklyDustAvg, 0),
+      month: safe(data.monthlyDustAvg, 0),
+    },
+    {
+      label: 'KOR (Prod)',
+      prev: safe(data.previouskor, 0),
+      week: safe(data.weeklyKORAvg, 0),
+      month: safe(data.monthlyKORAvg, 0),
+    },
+    {
+      label: 'KOR (Lab)',
+      prev: safe(data.previouskorlab, 0),
+      week: safe(data.weeklyKORLabAvg, 0),
+      month: safe(data.monthlyKORAvglab, 0),
+    },
+  ]
+
+  const bormaRows: CompareRow[] = [
+    {
+      label: 'Loss (Prod)',
+      prev: safe(data.previousBorma, 0),
+      week: safe(data.currentWeekBorma, 0),
+      month: safe(data.currentMonthBorma, 0),
+    },
+    {
+      label: 'Loss (Lab)',
+      prev: safe(data.previousBormalab, 0),
+      week: safe(data.currentWeekBormaLab, 0),
+      month: safe(data.currentMonthBormaLab, 0),
+    },
+  ]
+
+  const humidifierRows: CompareRow[] = [
+    {
+      label: 'Gain',
+      prev: safe(data.previousHumid, 0),
+      week: safe(data.currentWeekHumid, 0),
+      month: safe(data.currentMonthHumid, 0),
+    },
+  ]
+
+  const peelingRows: CompareRow[] = [
+    {
+      label: 'Broken',
+      prev: safe(data.previousBroken, 0),
+      week: safe(data.currentWeekBroken, 0),
+      month: safe(data.currentMonthBroken, 0),
+    },
+    {
+      label: 'Unpeel',
+      prev: safe(data.previousUnpeel, 0),
+      week: safe(data.currentWeekUnpeel, 0),
+      month: safe(data.currentMonthUnpeel, 0),
+    },
+    {
+      label: 'Chura',
+      prev: safe(data.previousChura, 0),
+      week: safe(data.currentWeekChura, 0),
+      month: safe(data.currentMonthChura, 0),
+    },
+  ]
+
+  const lots: LotItem[] = [
+    { label: 'Boiling', icon: 'flame-outline', tint: 'orange', lot: data.latestLotboil, backlog: data.backlogMayurdata },
+    { label: 'Scooping', icon: 'basket-outline', tint: 'blue', lot: data.latestLotscoop, backlog: data.backlogscoopdata },
+    { label: 'Borma', icon: 'thermometer-outline', tint: 'red', lot: data.latestLotborma, vLot: data.latestvLotborma, backlog: data.backlogbormadata },
+    { label: 'Humidifier', icon: 'water-outline', tint: 'teal', lot: data.latestLothumid, vLot: data.latestvLothumid, backlog: data.backloghumiddata },
+    { label: 'Peeling', icon: 'cut-outline', tint: 'green', lot: data.latestLotpeel, vLot: data.latestvLotpeel, backlog: data.backlogpeeldata },
+    { label: 'Mayur', icon: 'flower-outline', tint: 'violet', lot: data.latestLotMayur, vLot: data.latestVLotMayur, backlog: data.backlogMayurdata },
+    { label: 'Hamsa', icon: 'diamond-outline', tint: 'teal', lot: data.latestLothamsa, vLot: data.latestVLothamsa, backlog: data.backloghamsadata },
+    { label: 'Wholes', icon: 'cube-outline', tint: 'blue', lot: data.latestLotwholes, vLot: data.latestvLotwholes, backlog: data.backlogwholesdata },
+    { label: 'LW', icon: 'document-text-outline', tint: 'violet', lot: data.latestLotlw, vLot: data.latestvLotlw, backlog: data.backloglwdata },
+    { label: 'DPDS', icon: 'business-outline', tint: 'blue', lot: data.latestLotdpds, vLot: data.latestvLotdpds, backlog: data.backlogdpdsdata },
+    { label: 'Sorting', icon: 'funnel-outline', tint: 'teal', lot: data.latestLotsorting, vLot: data.latestvLotsorting, backlog: data.backlogsortingdata },
+    { label: 'Taiho', icon: 'pricetag-outline', tint: 'orange', lot: data.latestLotbigT, vLot: data.latestvLotbigT, backlog: data.backlogbigTdata },
+    { label: 'Village', icon: 'home-outline', tint: 'green', lot: data.latestLotvil, vLot: data.latestvLotvil, backlog: data.backlogvildata },
+    { label: 'Rejection', icon: 'close-circle-outline', tint: 'red', lot: data.latestLotrej, vLot: data.latestvLotrej, backlog: data.backlogrejdata },
+  ]
 
   return (
     <View style={styles.container}>
@@ -53,9 +187,7 @@ export default function KolkataDashboard({ data }: Props) {
       </View>
 
       {/* FY Overall Report */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Current FY 2026-27 Overall Report</Text>
-
+      <Section title="Current FY 2026-27 Overall Report" icon="document-text-outline" tint="violet">
         <ReportRow
           icon="download-outline"
           tint="blue"
@@ -113,131 +245,54 @@ export default function KolkataDashboard({ data }: Props) {
           unit="Ton"
           isLast
         />
-      </View>
+      </Section>
+
+      {/* Gatepass */}
+      <Section title="Gatepass" icon="car-outline" tint="blue" countLabel="Nos">
+        <CompareTable rows={gatepassRows} decimals={0} />
+      </Section>
+
+      {/* Boiling */}
+      <Section title="Boiling" icon="flame-outline" tint="orange" countLabel="Ton">
+        <CompareTable rows={boilingRows} />
+      </Section>
+
+      {/* Scooping */}
+      <Section title="Scooping" icon="basket-outline" tint="blue" countLabel="%">
+        <CompareTable rows={scoopingRows} />
+      </Section>
+
+      {/* Borma */}
+      <Section title="Borma" icon="thermometer-outline" tint="red" countLabel="%">
+        <CompareTable rows={bormaRows} />
+      </Section>
+
+      {/* Humidifier */}
+      <Section title="Humidifier" icon="water-outline" tint="teal" countLabel="%">
+        <CompareTable rows={humidifierRows} />
+      </Section>
+
+      {/* Peeling */}
+      <Section title="Peeling" icon="cut-outline" tint="green" countLabel="%">
+        <CompareTable rows={peelingRows} />
+      </Section>
 
       {/* Current Lot & Backlog */}
-      <View style={styles.section}>
-        <View style={styles.sectionHeaderRow}>
-          <Text style={styles.sectionTitle}>Current Lot & Backlog</Text>
-          <View style={styles.countChip}>
-            <Text style={styles.countChipText}>14 Lines</Text>
-          </View>
-        </View>
-
+      <Section title="Current Lot & Backlog" icon="layers-outline" tint="orange" countLabel={`${lots.length} Lines`}>
         <View style={styles.lotGrid}>
-          <LotCard
-            label="Boiling"
-            icon="flame-outline"
-            tint="orange"
-            currentLot={safe(data[LOT_DATA.boil.lotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo}
-            backlogData={data[LOT_DATA.boil.backlogKey] as any[] | undefined}
-          />
-          <LotCard
-            label="Scooping"
-            icon="basket-outline"
-            tint="blue"
-            currentLot={safe(data[LOT_DATA.scoop.lotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo}
-            vLot={LOT_DATA.scoop.vLotKey ? safe(data[LOT_DATA.scoop.vLotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo : undefined}
-            backlogData={data[LOT_DATA.scoop.backlogKey] as any[] | undefined}
-          />
-          <LotCard
-            label="Borma"
-            icon="thermometer-outline"
-            tint="red"
-            currentLot={safe(data[LOT_DATA.borma.lotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo}
-            vLot={LOT_DATA.borma.vLotKey ? safe(data[LOT_DATA.borma.vLotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo : undefined}
-            backlogData={data[LOT_DATA.borma.backlogKey] as any[] | undefined}
-          />
-          <LotCard
-            label="Humidifier"
-            icon="water-outline"
-            tint="teal"
-            currentLot={safe(data[LOT_DATA.humid.lotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo}
-            vLot={LOT_DATA.humid.vLotKey ? safe(data[LOT_DATA.humid.vLotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo : undefined}
-            backlogData={data[LOT_DATA.humid.backlogKey] as any[] | undefined}
-          />
-          <LotCard
-            label="Peeling"
-            icon="cut-outline"
-            tint="green"
-            currentLot={safe(data[LOT_DATA.peel.lotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo}
-            vLot={LOT_DATA.peel.vLotKey ? safe(data[LOT_DATA.peel.vLotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo : undefined}
-            backlogData={data[LOT_DATA.peel.backlogKey] as any[] | undefined}
-          />
-          <LotCard
-            label="Mayur"
-            icon="flower-outline"
-            tint="violet"
-            currentLot={safe(data[LOT_DATA.Mayur.lotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo}
-            vLot={LOT_DATA.Mayur.vLotKey ? safe(data[LOT_DATA.Mayur.vLotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo : undefined}
-            backlogData={data[LOT_DATA.Mayur.backlogKey] as any[] | undefined}
-          />
-          <LotCard
-            label="Hamsa"
-            icon="diamond-outline"
-            tint="teal"
-            currentLot={safe(data[LOT_DATA.hamsa.lotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo}
-            vLot={LOT_DATA.hamsa.vLotKey ? safe(data[LOT_DATA.hamsa.vLotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo : undefined}
-            backlogData={data[LOT_DATA.hamsa.backlogKey] as any[] | undefined}
-          />
-          <LotCard
-            label="Wholes"
-            icon="cube-outline"
-            tint="blue"
-            currentLot={safe(data[LOT_DATA.wholes.lotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo}
-            vLot={LOT_DATA.wholes.vLotKey ? safe(data[LOT_DATA.wholes.vLotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo : undefined}
-            backlogData={data[LOT_DATA.wholes.backlogKey] as any[] | undefined}
-          />
-          <LotCard
-            label="LW"
-            icon="document-text-outline"
-            tint="violet"
-            currentLot={safe(data[LOT_DATA.lw.lotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo}
-            vLot={LOT_DATA.lw.vLotKey ? safe(data[LOT_DATA.lw.vLotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo : undefined}
-            backlogData={data[LOT_DATA.lw.backlogKey] as any[] | undefined}
-          />
-          <LotCard
-            label="DPDS"
-            icon="business-outline"
-            tint="blue"
-            currentLot={safe(data[LOT_DATA.dpds.lotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo}
-            vLot={LOT_DATA.dpds.vLotKey ? safe(data[LOT_DATA.dpds.vLotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo : undefined}
-            backlogData={data[LOT_DATA.dpds.backlogKey] as any[] | undefined}
-          />
-          <LotCard
-            label="Sorting"
-            icon="funnel-outline"
-            tint="teal"
-            currentLot={safe(data[LOT_DATA.sorting.lotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo}
-            vLot={LOT_DATA.sorting.vLotKey ? safe(data[LOT_DATA.sorting.vLotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo : undefined}
-            backlogData={data[LOT_DATA.sorting.backlogKey] as any[] | undefined}
-          />
-          <LotCard
-            label="Taiho"
-            icon="pricetag-outline"
-            tint="orange"
-            currentLot={safe(data[LOT_DATA.bigT.lotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo}
-            vLot={LOT_DATA.bigT.vLotKey ? safe(data[LOT_DATA.bigT.vLotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo : undefined}
-            backlogData={data[LOT_DATA.bigT.backlogKey] as any[] | undefined}
-          />
-          <LotCard
-            label="Village"
-            icon="home-outline"
-            tint="green"
-            currentLot={safe(data[LOT_DATA.vil.lotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo}
-            vLot={LOT_DATA.vil.vLotKey ? safe(data[LOT_DATA.vil.vLotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo : undefined}
-            backlogData={data[LOT_DATA.vil.backlogKey] as any[] | undefined}
-          />
-          <LotCard
-            label="Rejection"
-            icon="close-circle-outline"
-            tint="red"
-            currentLot={safe(data[LOT_DATA.rej.lotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo}
-            vLot={LOT_DATA.rej.vLotKey ? safe(data[LOT_DATA.rej.vLotKey] as { LotNo: string }, { LotNo: 'N/A' }).LotNo : undefined}
-            backlogData={data[LOT_DATA.rej.backlogKey] as any[] | undefined}
-          />
+          {lots.map((item) => (
+            <LotCard
+              key={item.label}
+              label={item.label}
+              icon={item.icon}
+              tint={item.tint}
+              currentLot={safe(item.lot?.LotNo, 'N/A')}
+              vLot={item.vLot ? safe(item.vLot.LotNo, 'N/A') : undefined}
+              backlogData={item.backlog}
+            />
+          ))}
         </View>
-      </View>
+      </Section>
     </View>
   )
 }
@@ -264,47 +319,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     columnGap: 10,
     marginBottom: 16,
-  },
-  section: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#E5E8EC',
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 2,
-  },
-  sectionHeaderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 6,
-  },
-  sectionTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: TEXT_PRIMARY,
-    letterSpacing: -0.2,
-    marginBottom: 6,
-    flexShrink: 1,
-  },
-  countChip: {
-    backgroundColor: '#F2F4F7',
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    marginLeft: 8,
-  },
-  countChipText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: TEXT_MUTED,
-    letterSpacing: 0.3,
-    textTransform: 'uppercase',
   },
   lotGrid: {
     flexDirection: 'row',

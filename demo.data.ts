@@ -1,6 +1,6 @@
-import { AfricaData, IndoreDataType } from "./types/apiResponse.type";
+import { AfricaData, IndoreDataType, KolkataDataType } from "./types/apiResponse.type";
 
-export const DEFAULT_DATA: any = {
+export const kolkataData: KolkataDataType = {
     backlogMayurdata: [{ current_backlog: '4809.00' }],
     latestLotMayur: { LotNo: '2026-161' },
     latestVLotMayur: { LotNo: '2026-V170' },
@@ -68,11 +68,6 @@ export const DEFAULT_DATA: any = {
     currentMonthBormaLab: 6.82125,
     currentMonthHumid: 3.532593,
     monthResultGate: 176,
-    customBoiling: 0,
-    customBorma: 0,
-    customBormalab: 0,
-    customHumid: 0,
-    customGate: 0,
     currentYearBoiling: 4191810,
     fyResultBorma: { total: '6.387134' },
     fyResultHumid: { total: '3.345636' },
@@ -100,16 +95,6 @@ export const DEFAULT_DATA: any = {
     weeklyUncutAvg: 0.8263640857780548,
     weeklyKORAvg: 48.53,
     weeklyKORLabAvg: 0,
-    customBrokenAvg: 0,
-    customDustAvg: 0,
-    customNoncutAvg: 0,
-    customUnscoopAvg: 0,
-    customUncutAvg: 0,
-    customKORAvg: 0,
-    customKORAvglab: 0,
-    customBroken: 0,
-    customUnpeel: 0,
-    customChura: 0,
     currentMonthBroken: 0,
     currentMonthUnpeel: 0,
     currentMonthChura: 0,

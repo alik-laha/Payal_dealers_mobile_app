@@ -4,8 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AfricaDashboard from '../../components/dashboards/AfricaDashboard';
 import IndoreDashboard from '../../components/dashboards/IndoreDashboard';
 import KolkataDashboard from '../../components/dashboards/KolkataDashboard';
-import { DEFAULT_DATA, indoreData } from '@/demo.data';
-import { africaData } from '@/demo.data';
+import { kolkataData, indoreData, africaData } from '@/demo.data';
 
 
 /* ---------------------------------- theme ---------------------------------- */
@@ -93,7 +92,7 @@ export default function Dashboard() {
         contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 20 }]}
         showsVerticalScrollIndicator={false}
       >
-        {selectedSite === 'kolkata' && <KolkataDashboard data={DEFAULT_DATA} />}
+        {selectedSite === 'kolkata' && <KolkataDashboard data={kolkataData} />}
         {selectedSite === 'indore' && <IndoreDashboard data={indoreData} />}
         {selectedSite === 'africa' && <AfricaDashboard data={africaData} />}
       </ScrollView>

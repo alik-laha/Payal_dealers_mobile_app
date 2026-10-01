@@ -36,7 +36,6 @@ export type KolkataDataType = {
   latestvLothumid: { LotNo: string }
   backloghumiddata: { current_backlog: string }[]
   latestLotscoop: { LotNo: string }
-  latestvLotscoop: { LotNo: string }
   backlogscoopdata: { current_backlog1: string | null; current_backlog2: string | null }[]
   latestLotboil: { LotNo: string | null }
   usercount: number
@@ -67,11 +66,6 @@ export type KolkataDataType = {
   currentMonthBormaLab: number
   currentMonthHumid: number
   monthResultGate: number
-  customBoiling: number
-  customBorma: number
-  customBormalab: number
-  customHumid: number
-  customGate: number
   currentYearBoiling: number
   fyResultBorma: { total: string | null }
   fyResultHumid: { total: string | null }
@@ -99,16 +93,6 @@ export type KolkataDataType = {
   weeklyUncutAvg: number
   weeklyKORAvg: number
   weeklyKORLabAvg: number
-  customBrokenAvg: number
-  customDustAvg: number
-  customNoncutAvg: number
-  customUnscoopAvg: number
-  customUncutAvg: number
-  customKORAvg: number
-  customKORAvglab: number
-  customBroken: number
-  customUnpeel: number
-  customChura: number
   currentMonthBroken: number
   currentMonthUnpeel: number
   currentMonthChura: number

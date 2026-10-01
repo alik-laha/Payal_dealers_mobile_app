@@ -2,7 +2,7 @@ import { LotKey, LotSection } from "./types/apiResponse.type";
 
 export const LOT_DATA: Record<LotKey, LotSection> = {
   boil: { lotKey: 'latestLotboil', backlogKey: 'backlogMayurdata' },
-  scoop: { lotKey: 'latestLotscoop', vLotKey: 'latestvLotscoop', backlogKey: 'backlogscoopdata' },
+  scoop: { lotKey: 'latestLotscoop', backlogKey: 'backlogscoopdata' },
   borma: { lotKey: 'latestLotborma', vLotKey: 'latestvLotborma', backlogKey: 'backlogbormadata' },
   humid: { lotKey: 'latestLothumid', vLotKey: 'latestvLothumid', backlogKey: 'backloghumiddata' },
   peel: { lotKey: 'latestLotpeel', vLotKey: 'latestvLotpeel', backlogKey: 'backlogpeeldata' },

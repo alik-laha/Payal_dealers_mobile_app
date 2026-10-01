@@ -37,17 +37,17 @@ export type KolkataDataType = {
   backloghumiddata: { current_backlog: string }[]
   latestLotscoop: { LotNo: string }
   latestvLotscoop: { LotNo: string }
-  backlogscoopdata: { current_backlog1: string; current_backlog2: string }[]
-  latestLotboil: { LotNo: string }
+  backlogscoopdata: { current_backlog1: string | null; current_backlog2: string | null }[]
+  latestLotboil: { LotNo: string | null }
   usercount: number
   employeecount: number
   pendingGatepass: number
   village_pending: number
   village_pending_in: number
-  fyReceivingTotal: { Total_Receiving: string }
+  fyReceivingTotal: { Total_Receiving: string | null }
   village_out_gate: number
   village_out_prod: number
-  Ville_Inside_gatepass: { Village_In: string }
+  Ville_Inside_gatepass: { Village_In: string | null }
   previousBoiling: number
   previousBorma: number
   previousHumid: number
@@ -73,8 +73,8 @@ export type KolkataDataType = {
   customHumid: number
   customGate: number
   currentYearBoiling: number
-  fyResultBorma: { total: string }
-  fyResultHumid: { total: string }
+  fyResultBorma: { total: string | null }
+  fyResultHumid: { total: string | null }
   previousscoopDate: string
   previouswholesprcntg: number
   previousbrokenprcntg: number
@@ -169,4 +169,250 @@ export type LotSection = {
   lotKey: keyof KolkataDataType
   vLotKey?: keyof KolkataDataType
   backlogKey: keyof KolkataDataType
+}
+
+
+export type IndoreDataType = {
+  backlogMayurdata: {
+    current_backlog: string;
+  }[];
+
+  latestLotMayur: {
+    LotNo: string;
+  } | null;
+
+  latestVLotMayur: {
+    LotNo: string;
+  } | null;
+
+  latestLothamsa: {
+    LotNo: string;
+  } | null;
+
+  latestVLothamsa: {
+    LotNo: string;
+  } | null;
+
+  backloghamsadata: {
+    current_backlog: string;
+  }[];
+
+  latestLotdpds: {
+    LotNo: string;
+  } | null;
+
+  latestvLotdpds: {
+    LotNo: string;
+  } | null;
+
+  backlogdpdsdata: {
+    current_backlog: string;
+  }[];
+
+  latestLotsorting: {
+    LotNo: string;
+  } | null;
+
+  latestvLotsorting: {
+    LotNo: string;
+  } | null;
+
+  backlogsortingdata: {
+    current_backlog: string;
+  }[];
+
+  latestLotwholes: {
+    LotNo: string;
+  } | null;
+
+  latestvLotwholes: {
+    LotNo: string;
+  } | null;
+
+  backlogwholesdata: {
+    current_backlog: string;
+  }[];
+
+  latestLotlw: {
+    LotNo: string;
+  } | null;
+
+  latestvLotlw: {
+    LotNo: string;
+  } | null;
+
+  backloglwdata: {
+    current_backlog: string;
+  }[];
+
+  latestLotbigT: {
+    LotNo: string;
+  } | null;
+
+  latestvLotbigT: {
+    LotNo: string;
+  } | null;
+
+  backlogbigTdata: {
+    current_backlog: string;
+  }[];
+
+  latestLotvil: {
+    LotNo: string;
+  } | null;
+
+  latestvLotvil: {
+    LotNo: string;
+  } | null;
+
+  backlogvildata: {
+    current_backlog: string;
+  }[];
+
+  latestLotrej: {
+    LotNo: string;
+  } | null;
+
+  latestvLotrej: {
+    LotNo: string;
+  } | null;
+
+  backlogrejdata: {
+    current_backlog: string;
+  }[];
+
+  latestLotpeel: {
+    LotNo: string;
+  } | null;
+
+  latestvLotpeel: {
+    LotNo: string;
+  } | null;
+
+  backlogpeeldata: {
+    current_backlog: string;
+  }[];
+
+  latestLotborma: {
+    LotNo: string;
+  } | null;
+
+  backlogbormadata: {
+    current_backlog1: string;
+    current_backlog2: string;
+  }[];
+
+  latestLothumid: {
+    LotNo: string;
+  } | null;
+
+  backloghumiddata: {
+    current_backlog: string;
+  }[];
+
+  latestLotscoop: {
+    LotNo: string;
+  } | null;
+
+  backlogscoopdata: {
+    current_backlog1: string | null;
+    current_backlog2: string | null;
+  }[];
+
+  latestLotboil: {
+    LotNo: string;
+  } | null;
+
+  usercount: number;
+  employeecount: number;
+  pendingGatepass: number;
+  village_pending: number;
+  village_pending_in: number;
+
+  fyReceivingTotal: {
+    Total_Receiving: string | null;
+  };
+
+  village_out_gate: number;
+  village_out_prod: number;
+
+  Ville_Inside_gatepass: {
+    Village_In: string;
+  };
+
+  previousBoiling: number;
+  previousBorma: number;
+  previousHumid: number;
+  previousGate: number;
+  previousBormalab: number;
+
+  previousBoilingDate: string;
+  previousBormaDate: string;
+  previousHumidDate: string;
+  previousGateDate: string;
+
+  currentWeekBoil: number;
+  currentWeekBorma: number;
+  currentWeekBormaLab: number;
+  currentWeekHumid: number;
+  weekResultGate: number;
+
+  currentMonthBoiling: number;
+  currentMonthBorma: number;
+  currentMonthBormaLab: number;
+  currentMonthHumid: number;
+  monthResultGate: number;
+
+  currentYearBoiling: number;
+
+  fyResultBorma: {
+    total: string;
+  };
+
+  fyResultHumid: {
+    total: string;
+  };
+
+  previousscoopDate: string;
+
+  previouswholesprcntg: number;
+  previousbrokenprcntg: number;
+  previousuncutprcntg: number;
+  previousnoncutprcntg: number;
+  previousunscoopprcntg: number;
+  previousdustprcntg: number;
+  previousrejectionprcntg: number;
+
+  previouskor: number;
+  previouskorlab: number;
+
+  monthlyBrokenAvg: number;
+  monthlyDustAvg: number;
+  monthlyNoncutAvg: number;
+  monthlyUnscoopAvg: number;
+  monthlyUncutAvg: number;
+  monthlyKORAvg: number;
+  monthlyKORAvglab: number;
+
+  weeklyBrokenAvg: number;
+  weeklyDustAvg: number;
+  weeklyNoncutAvg: number;
+  weeklyUnscoopAvg: number;
+  weeklyUncutAvg: number;
+  weeklyKORAvg: number;
+  weeklyKORLabAvg: number;
+
+  previousBroken: number;
+  previousChura: number;
+  previousUnpeel: number;
+
+  currentMonthBroken: number;
+  currentMonthUnpeel: number;
+  currentMonthChura: number;
+
+  currentWeekBroken: number;
+  currentWeekUnpeel: number;
+  currentWeekChura: number;
+
+  previousPeelDate: string;
 }

@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AfricaDashboard from '../../components/dashboards/AfricaDashboard';
 import IndoreDashboard from '../../components/dashboards/IndoreDashboard';
 import KolkataDashboard from '../../components/dashboards/KolkataDashboard';
-import { DEFAULT_DATA } from '@/demo.data';
+import { DEFAULT_DATA, indoreData } from '@/demo.data';
 import { africaData } from '@/demo.data';
 
 
@@ -94,7 +94,7 @@ export default function Dashboard() {
         showsVerticalScrollIndicator={false}
       >
         {selectedSite === 'kolkata' && <KolkataDashboard data={DEFAULT_DATA} />}
-        {selectedSite === 'indore' && <IndoreDashboard />}
+        {selectedSite === 'indore' && <IndoreDashboard data={indoreData} />}
         {selectedSite === 'africa' && <AfricaDashboard data={africaData} />}
       </ScrollView>
 

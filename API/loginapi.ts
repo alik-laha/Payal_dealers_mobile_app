@@ -1,11 +1,14 @@
+import { API_URL } from "@/export.data";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { usePermittedWebsiteStore } from "@/store/permittedWebsites.store"
 
-export async function loginApi(username: string, password: string) {
+export async function loginApi(userName: string, password: string) {
+    const { setAllPermittedWebsites } = usePermittedWebsiteStore.getState();
     try {
-        const response = await fetch('http://192.168.43.234:4000/login', {
+        const response = await fetch(`${API_URL}/appapi/masterlogin`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password }),
+            body: JSON.stringify({ userName, password }),
         })
 
         if (!response.ok) {
@@ -20,7 +23,12 @@ export async function loginApi(username: string, password: string) {
             return false
         }
 
-        const permittedWebsites = data.permittedWebsites || []
+        const permittedWebsites: string[] = data.permittedWebsites.map((item: any) => {
+            return item.permittedWebsite.url
+        });
+
+        setAllPermittedWebsites(data.permittedWebsites);
+
         const permissions: string[] = []
         if (permittedWebsites.includes('kolkata')) permissions.push('kolkata')
         if (permittedWebsites.includes('africa')) permissions.push('africa')
@@ -28,6 +36,8 @@ export async function loginApi(username: string, password: string) {
 
         await AsyncStorage.setItem("JWT_KEY", data.token);
         await AsyncStorage.setItem("PERMISSIONS", JSON.stringify(permissions));
+        await AsyncStorage.setItem("ROLE", JSON.stringify(data.role));
+        await AsyncStorage.setItem("USER_NAME", JSON.stringify(data.name));
         return true
 
     } catch (error) {
@@ -36,8 +46,40 @@ export async function loginApi(username: string, password: string) {
     }
 }
 
+export async function getDashboard(site: string) {
+    const token = await AsyncStorage.getItem("JWT_KEY");
+
+    if (!token) {
+        throw new Error("Token is required.");
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/appapi/appdashboard/${site}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+        })
+
+        const data = await response.json();
+        console.log(data);
+
+        if (!response.ok) {
+            console.error('Dashboard data fetch failed:', response.statusText)
+            return false
+        }
+
+        return data.data
+
+    } catch (error) {
+        console.error('Login error:', error)
+        return false
+    }
+}
+
 export async function logout() {
-    await AsyncStorage.multiRemove(["JWT_KEY", "PERMISSIONS"]);
+    await AsyncStorage.multiRemove(["JWT_KEY", "PERMISSIONS", "ROLE", "USER_NAME"]);
 }
 
 export async function getPermissions(): Promise<string[]> {

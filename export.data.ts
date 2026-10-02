@@ -1,5 +1,7 @@
 import { LotKey, LotSection } from "./types/apiResponse.type";
 
+export const API_URL = "http://192.168.43.234:3000"
+
 export const LOT_DATA: Record<LotKey, LotSection> = {
   boil: { lotKey: 'latestLotboil', backlogKey: 'backlogMayurdata' },
   scoop: { lotKey: 'latestLotscoop', backlogKey: 'backlogscoopdata' },

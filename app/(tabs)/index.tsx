@@ -1,10 +1,11 @@
-import { useState } from 'react';
-import { Modal, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Modal, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getDashboard } from '@/API/loginapi';
+import { AfricaData, IndoreDataType, KolkataDataType } from '@/types/apiResponse.type';
 import AfricaDashboard from '../../components/dashboards/AfricaDashboard';
 import IndoreDashboard from '../../components/dashboards/IndoreDashboard';
 import KolkataDashboard from '../../components/dashboards/KolkataDashboard';
-import { kolkataData, indoreData, africaData } from '@/demo.data';
 
 
 /* ---------------------------------- theme ---------------------------------- */
@@ -33,6 +34,12 @@ const SITE_OPTIONS = [
 ] as const
 
 type SiteKey = (typeof SITE_OPTIONS)[number]['key']
+
+type SiteDataMap = {
+  kolkata?: KolkataDataType
+  indore?: IndoreDataType
+  africa?: AfricaData
+}
 
 /* ------------------------------ icon component ----------------------------- */
 
@@ -66,8 +73,44 @@ export default function Dashboard() {
   const insets = useSafeAreaInsets()
   const [selectedSite, setSelectedSite] = useState<SiteKey>('kolkata')
   const [showSelector, setShowSelector] = useState(false)
+  const [dashboards, setDashboards] = useState<SiteDataMap>({})
+  const [errors, setErrors] = useState<Partial<Record<SiteKey, string>>>({})
+  const [reloadKey, setReloadKey] = useState(0)
 
   const currentSite = SITE_OPTIONS.find(s => s.key === selectedSite)!
+  const siteData = dashboards[selectedSite]
+  const siteError = errors[selectedSite]
+  const loading = !siteData && !siteError
+
+  useEffect(() => {
+    let active = true
+
+    getDashboard(selectedSite)
+      .then((res: any) => {
+        if (!active) return
+        if (!res) {
+          setErrors(prev => ({ ...prev, [selectedSite]: 'Could not load dashboard data.' }))
+          return
+        }
+        setDashboards(prev => ({ ...prev, [selectedSite]: res }))
+      })
+      .catch((err: unknown) => {
+        if (!active) return
+        setErrors(prev => ({
+          ...prev,
+          [selectedSite]: err instanceof Error ? err.message : 'Could not load dashboard data.',
+        }))
+      })
+
+    return () => {
+      active = false
+    }
+  }, [selectedSite, reloadKey])
+
+  const retry = () => {
+    setErrors(prev => ({ ...prev, [selectedSite]: undefined }))
+    setReloadKey(key => key + 1)
+  }
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -87,15 +130,29 @@ export default function Dashboard() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView 
-        style={{ flex: 1, backgroundColor: '#F5F6F8' }}
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 20 }]}
-        showsVerticalScrollIndicator={false}
-      >
-        {selectedSite === 'kolkata' && <KolkataDashboard data={kolkataData} />}
-        {selectedSite === 'indore' && <IndoreDashboard data={indoreData} />}
-        {selectedSite === 'africa' && <AfricaDashboard data={africaData} />}
-      </ScrollView>
+      {loading ? (
+        <View style={styles.stateBox}>
+          <ActivityIndicator size="large" color={TEXT_PRIMARY} />
+          <Text style={styles.stateText}>Loading {currentSite.name} dashboard…</Text>
+        </View>
+      ) : siteError && !siteData ? (
+        <View style={styles.stateBox}>
+          <Text style={styles.stateError}>{siteError}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={retry} activeOpacity={0.8}>
+            <Text style={styles.retryText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <ScrollView
+          style={{ flex: 1, backgroundColor: '#F5F6F8' }}
+          contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 20 }]}
+          showsVerticalScrollIndicator={false}
+        >
+          {selectedSite === 'kolkata' && dashboards.kolkata && <KolkataDashboard data={dashboards.kolkata} />}
+          {selectedSite === 'indore' && dashboards.indore && <IndoreDashboard data={dashboards.indore} />}
+          {selectedSite === 'africa' && dashboards.africa && <AfricaDashboard data={dashboards.africa} />}
+        </ScrollView>
+      )}
 
       {/* Bottom Sheet Modal */}
       <Modal animationType="slide" transparent visible={showSelector} onRequestClose={() => setShowSelector(false)}>
@@ -121,6 +178,9 @@ export default function Dashboard() {
                     onPress={() => {
                       setSelectedSite(site.key)
                       setShowSelector(false)
+                      setDashboards({})
+                      setErrors({})
+                      setReloadKey(key => key + 1)
                     }}
                     activeOpacity={0.7}
                   >
@@ -211,6 +271,40 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 12,
+  },
+
+  /* Loading / Error states */
+  stateBox: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 32,
+  },
+  stateText: {
+    marginTop: 14,
+    fontSize: 14,
+    fontWeight: '500',
+    color: TEXT_MUTED,
+    textAlign: 'center',
+  },
+  stateError: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#C43D3D',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  retryButton: {
+    backgroundColor: TEXT_PRIMARY,
+    paddingHorizontal: 28,
+    paddingVertical: 12,
+    borderRadius: 12,
+  },
+  retryText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+    letterSpacing: 0.2,
   },
   
   /* Modal / Bottom Sheet */
